@@ -13,7 +13,7 @@ main = scotty 5000 $ do
   get "/" $ do
         html $ renderText $ do
             headerr
-            p_ "All datas"
+            p_ "Hey mon gaaaars"
             p_ "This is the ulcooooooooforum !"
 
   get "/allDatas" $ do
@@ -27,17 +27,25 @@ main = scotty 5000 $ do
        res <- liftIO $ withConnection "ulcoForum.db" dbSelectAllSubjects
        html $ renderText $ do
            headerr
-           p_ "All datas"
+           p_ "All Threads"
            mapM_ fmtSubjects res
+
+  get "/onethread/:id" $ do
+       id <- param "id"
+       res <- liftIO $ withConnection "ulcoForum.db" (dbSelectAllMessagesFromSubjectId id) 
+       html $ renderText $ do
+           headerr
+           mapM_ fmtMess res
 
 
 headerr :: Html ()
 headerr = do 
     img_ [src_ "https://www.haskell.org/img/haskell-logo.svg"]
+    p_ "Antoine OFFROY"
     span_ " - "
     a_ [href_ "/allDatas"] "AllData"
     span_ " - "
-    a_ [href_ "/allThread"] "AllThread"
+    a_ [href_ "/allThreads"] "AllThread"
 
 
 fmtMessages :: (Text, Text, Text) -> Html ()
@@ -47,10 +55,17 @@ fmtMessages (user, libelle, sujet) =
         div_ [class_ "row"] $ do
             span_ $ toHtml user
             span_ " : "
-            span_ $ toHtml sujet
+            span_ $ toHtml libelle
 
 
 fmtSubjects :: (Int, Text) -> Html ()
 fmtSubjects (id, sujet) = 
     li_ $ do
         a_ [href_ ("/onethread/"<>showt id)] $ toHtml sujet
+ 
+fmtMess :: (Text, Text) -> Html ()
+fmtMess (libelle, user) =
+    li_ $ do
+        span_ $ toHtml user
+        span_ " : "
+        span_ $ toHtml libelle

@@ -11,6 +11,6 @@ dbSelectAllMessages conn = query_ conn "SELECT message_user, message_libelle, su
 dbSelectAllSubjects :: Connection -> IO [(Int, Text)]
 dbSelectAllSubjects conn = query_ conn "SELECT sujet_id, sujet_title FROM sujet"
 
---dbSelectAllMoviesFromPersonId :: Connection -> Int -> IO [[Text]]
---dbSelectAllMoviesFromPersonId conn p = query conn "SELECT movie_title FROM movie INNER JOIN prod ON prod_movie=movie_id WHERE prod_person=(?)" (Only p)
+dbSelectAllMessagesFromSubjectId :: Int-> Connection -> IO [(Text, Text)]
+dbSelectAllMessagesFromSubjectId p conn = query conn "SELECT message_libelle, message_user FROM message WHERE message_sujet=(?)" (Only p)
 
