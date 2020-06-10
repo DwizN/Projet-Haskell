@@ -12,31 +12,32 @@ main :: IO ()
 main = scotty 5000 $ do
   get "/" $ do
         html $ renderText $ do
-            img_ [src_ "https://www.haskell.org/img/haskell-logo.svg"]
-            a_ [href_ "/allDatas"] "AllData"
-            a_ [href_ "/allThread"] "AllThread"
+            headerr
             p_ "All datas"
             p_ "This is the ulcooooooooforum !"
 
   get "/allDatas" $ do
       res <- liftIO $ withConnection "ulcoForum.db" dbSelectAllMessages
       html $ renderText $ do
-          img_ [src_ "https://www.haskell.org/img/haskell-logo.svg"]
-          a_ [href_ "/allDatas"] "AllData"
-          a_ [href_ "/allThread"] "AllThread"
+          headerr
           p_ "All datas"
           mapM_ fmtMessages res
 
-  get "/allDatas" $ do
+  get "/allThreads" $ do
        res <- liftIO $ withConnection "ulcoForum.db" dbSelectAllSubjects
        html $ renderText $ do
-           img_ [src_ "https://www.haskell.org/img/haskell-logo.svg"]
-           a_ [href_ "/allDatas"] "AllData"
-           a_ [href_ "/allThread"] "AllThread"
+           headerr
            p_ "All datas"
            mapM_ fmtSubjects res
 
 
+headerr :: Html ()
+headerr = do 
+    img_ [src_ "https://www.haskell.org/img/haskell-logo.svg"]
+    span_ " - "
+    a_ [href_ "/allDatas"] "AllData"
+    span_ " - "
+    a_ [href_ "/allThread"] "AllThread"
 
 
 fmtMessages :: (Text, Text, Text) -> Html ()
@@ -48,7 +49,8 @@ fmtMessages (user, libelle, sujet) =
             span_ " : "
             span_ $ toHtml sujet
 
+
 fmtSubjects :: (Int, Text) -> Html ()
-fmtSubject (id, sujet) = 
+fmtSubjects (id, sujet) = 
     li_ $ do
-        b_ $ toHtml sujet
+        a_ [href_ ("/onethread/"<>showt id)] $ toHtml sujet
